@@ -9,8 +9,6 @@
 (use-package emacs
   :ensure nil
   :custom
-  ;; Tell Emacs to prefer the treesitter mode for these languages.
-  ;; Note: Run `M-x treesit-install-language-grammar' before editing.
   (major-mode-remap-alist
    '((yaml-mode       . yaml-ts-mode)
      (bash-mode       . bash-ts-mode)
@@ -21,7 +19,6 @@
      (python-mode     . python-ts-mode)
      (lua-mode        . lua-ts-mode)))
   :hook
-  ;; Auto parenthesis matching
   (prog-mode . electric-pair-mode))
 
 ;; Built-in project management
@@ -34,7 +31,6 @@
 ;;; VERSION CONTROL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Magit: slowest Git client to ever exist (but we love it anyway)
 (use-package magit
   :ensure t
   :bind 
@@ -57,22 +53,30 @@
   :init
   (setq rust-mode-treesitter-derive t)
   :custom
-  (rust-format-on-save t)
-  (rust-rustfmt-switches '("--edition" "2024")))
+  (rust-format-on-save nil)
+  :config
+  (defun my/rust-test-current-file ()
+    "Run cargo test using the current file name as a filter."
+    (interactive)
+    (if-let* ((filename (buffer-file-name)))
+        (let* ((basename (file-name-base filename))
+               (filter (if (member basename '("main" "lib")) "" basename))
+               (cmd (string-trim (format "cargo test -- --nocapture %s" filter))))
+          (compile cmd))
+      (message "Buffer is not visiting a file!")))
+  :bind (:map rust-mode-map
+              ("C-c C-c C-u" . my/rust-test-current-file)))
+
+;; Ensure test shortcut works in rust-ts-mode as well
+(with-eval-after-load 'rust-ts-mode
+  (define-key rust-ts-mode-map (kbd "C-c C-c C-u") #'my/rust-test-current-file))
 
 (use-package swift-mode
   :ensure t
   :custom
   (swift-mode:basic-offset 4)
   :hook (swift-mode . (lambda ()
-                        ;; Enable Semantic Tokens locally for Swift to get compiler-accurate 
-                        ;; highlighting (since we don't have a swift-ts-mode)
-                        (setq-local eglot-ignored-server-capabilities '(:inlayHintProvider))
-                        ;; Format on save
-                        (add-hook 'before-save-hook 
-                                  (lambda () 
-                                    (eglot-format-buffer)) 
-                                  nil t))))
+                        (setq-local eglot-ignored-server-capabilities '(:inlayHintProvider)))))
 
 (use-package dart-mode
   :ensure t
@@ -81,45 +85,39 @@
 
 (defvar flutter-tools-path
   (cond
-   ;; Windows
-  ((eq system-type 'windows-nt) 
-    "C:/Users/huypk/Projects/flutter-tools")
-   ;; Linux
-   ((eq system-type 'gnu/linux) 
-    (expand-file-name "~/Projects/flutter-tools"))
-   ;; macOS
-   (t 
-    "~/Developer/flutter-tools")))
+   ((eq system-type 'windows-nt) "C:/Users/huypk/Projects/flutter-tools")
+   ((eq system-type 'gnu/linux)  (expand-file-name "~/Projects/flutter-tools"))
+   (t                            "~/Developer/flutter-tools")))
 
 (add-to-list 'load-path flutter-tools-path)
-(require 'flutter-tools)
+(require 'flutter-tools nil t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; LSP
+;;; LSP & FORMATTING
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package eglot
   :ensure nil
   :hook
-  ((rust-mode python-ts-mode lua-ts-mode dart-mode swift-mode) . eglot-ensure)
+  ((rust-mode rust-ts-mode python-ts-mode lua-ts-mode dart-mode swift-mode) . eglot-ensure)
+  (eglot-managed-mode . (lambda ()
+                          (add-hook 'before-save-hook #'eglot-format-buffer nil t)))
   :custom
   (eglot-ignored-server-capabilities '(:inlayHintProvider :semanticTokensProvider))
   (eglot-send-changes-idle-time 0.5)
   (eglot-extend-to-xref t)
   (eglot-events-buffer-config '(:size 0))
   :config
-  (fset #'jsonrpc--log-event #'ignore)
   (add-to-list 'eglot-server-programs
                `(swift-mode . ,(if (eq system-type 'darwin)
                                    '("xcrun" "sourcekit-lsp")
                                  '("sourcekit-lsp")))))
 
-;; Set this globally so Eglot catches it immediately when rust-analyzer starts.
+;; Global rust-analyzer workspace config
 (setq-default eglot-workspace-configuration
-              '((:rust-analyzer .
-				(:check (:command "clippy" :extraArgs ["--no-deps"])
-					:procMacro (:enable t)
-					:cargo (:buildScripts (:enable t))))))
+              '((:rust-analyzer . (:check (:command "clippy" :extraArgs ["--no-deps"])
+                                   :procMacro (:enable t)
+                                   :cargo (:buildScripts (:enable t))))))
 
 (use-package eldoc
   :ensure nil
@@ -129,10 +127,10 @@
   (defun my-eldoc-dynamic-multiline (orig-fn &rest args)
     "Expand Eldoc to multiple lines only if there is a Flymake diagnostic at point."
     (let ((eldoc-echo-area-use-multiline-p
-	   (if (and (bound-and-true-p flymake-mode)
-		    (flymake-diagnostics (point)))
-	       t
-	     nil)))
+	       (if (and (bound-and-true-p flymake-mode)
+		            (flymake-diagnostics (point)))
+	           t
+	         nil)))
       (apply orig-fn args)))
   (advice-add 'eldoc-display-in-echo-area :around #'my-eldoc-dynamic-multiline))
 
