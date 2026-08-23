@@ -8,11 +8,11 @@
 
 ;; Font Configuration
 (setq-default line-spacing 0.3)
-(setq my-font "JetBrainsMono NF")
+(setq my-font "IntoneMono Nerd Font")
 (setq my-font-size 
       (cond ((eq system-type 'darwin) 135) 
             ((eq system-type 'windows-nt) 100) 
-            (t 140))) 
+            (t 105))) 
 
 (when (find-font (font-spec :family my-font)) 
   (set-face-attribute 'default nil :family my-font :height my-font-size :weight 'normal)

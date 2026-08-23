@@ -80,9 +80,17 @@
   (dart-format-on-save t))
 
 (defvar flutter-tools-path
-  (if (eq system-type 'windows-nt)
-      "C:/Users/huypk/Projects/flutter-tools"
-    "/Users/huypk/Developer/flutter-tools"))
+  (cond
+   ;; Windows
+  ((eq system-type 'windows-nt) 
+    "C:/Users/huypk/Projects/flutter-tools")
+   ;; Linux
+   ((eq system-type 'gnu/linux) 
+    (expand-file-name "~/Developer/flutter-tools"))
+   ;; macOS
+   (t 
+    "/Users/huypk/Developer/flutter-tools")))
+
 (add-to-list 'load-path flutter-tools-path)
 (require 'flutter-tools)
 

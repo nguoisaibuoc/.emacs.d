@@ -4,6 +4,10 @@
 ;;                   Core
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(setq fast-but-imprecise-scrolling t)
+(setq jit-lock-defer-time 0)
+(setq redisplay-skip-fontification-on-input t)
+
 (use-package evil
   :ensure t
 
@@ -12,6 +16,8 @@
   (setq evil-undo-system 'undo-redo)
   (setq evil-want-C-u-scroll t)
   (setq evil-want-keybinding nil)
+  (setq evil-esc-delay 0)
+
 
   :config
   (evil-mode)

@@ -60,7 +60,7 @@
 
 (add-to-list 'load-path (expand-file-name "extras" user-emacs-directory))
 
+(require 'vim-like)
 (require 'base)
 (require 'dev)
-(require 'vim-like)
 (require 'organizer)
