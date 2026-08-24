@@ -54,7 +54,11 @@
   :hook (swift-mode . (lambda ()
                         (setq-local eglot-ignored-server-capabilities '(:inlayHintProvider)))))
 
-(add-to-list 'load-path (expand-file-name "extras/lang" user-emacs-directory))
+(let ((lang-dir (expand-file-name "extras/lang" user-emacs-directory)))
+  (add-to-list 'load-path lang-dir)
+  (let ((default-directory lang-dir))
+    (normal-top-level-add-subdirs-to-load-path)))
+
 (require 'rust-tools)
 (require 'flutter-tools nil t)
 
