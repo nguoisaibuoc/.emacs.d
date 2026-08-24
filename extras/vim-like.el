@@ -4,13 +4,8 @@
 ;;                   Core
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(setq fast-but-imprecise-scrolling t)
-(setq jit-lock-defer-time 0)
-(setq redisplay-skip-fontification-on-input t)
-
 (use-package evil
   :ensure t
-
   :init
   (setq evil-respect-visual-line-mode t)
   (setq evil-undo-system 'undo-redo)

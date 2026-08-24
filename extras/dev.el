@@ -3,6 +3,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; CORE DEV SETTINGS & TREE-SITTER
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
 
@@ -55,21 +56,50 @@
   :custom
   (rust-format-on-save nil)
   :config
+  (defun my/rust--current-function-name ()
+    "Find the name of the function enclosing the point."
+    (or
+     ;; Try Tree-sitter AST (accurate and handles nested code/closures)
+     (when (and (fboundp 'treesit-node-at)
+                (treesit-language-at (point)))
+       (let ((node (treesit-node-at (point))))
+         (while (and node (not (string= (treesit-node-type node) "function_item")))
+           (setq node (treesit-node-parent node)))
+         (when node
+           (treesit-node-text (treesit-node-child-by-field-name node "name") t))))
+     ;; Fallback: regex search backwards for fn name
+     (save-excursion
+       (when (re-search-backward "\\bfn\\s-+\\([a-zA-Z0-9_]+\\)" nil t)
+         (match-string-no-properties 1)))))
+
+  (defun my/rust-test-current-function ()
+    "Run cargo test only for the test function under point."
+    (interactive)
+    (if-let* ((fn-name (my/rust--current-function-name)))
+        (let ((cmd (format "cargo test %s -- --nocapture" fn-name)))
+          (compile cmd))
+      (message "No Rust function found at cursor!")))
+
   (defun my/rust-test-current-file ()
-    "Run cargo test using the current file name as a filter."
+    "Run cargo test using the module name or current file name as a filter."
     (interactive)
     (if-let* ((filename (buffer-file-name)))
         (let* ((basename (file-name-base filename))
-               (filter (if (member basename '("main" "lib")) "" basename))
+               (filter
+                (cond
+                 ((member basename '("main" "lib")) "")
+                 ((string= basename "mod")
+                  (let ((parent-dir (file-name-nondirectory
+                                     (directory-file-name (file-name-directory filename)))))
+                    (if (string= parent-dir "src") "" parent-dir)))
+                 (t basename)))
                (cmd (string-trim (format "cargo test -- --nocapture %s" filter))))
           (compile cmd))
       (message "Buffer is not visiting a file!")))
-  :bind (:map rust-mode-map
-              ("C-c C-c C-u" . my/rust-test-current-file)))
 
-;; Ensure test shortcut works in rust-ts-mode as well
-(with-eval-after-load 'rust-ts-mode
-  (define-key rust-ts-mode-map (kbd "C-c C-c C-u") #'my/rust-test-current-file))
+  :bind (:map rust-mode-map
+              ("C-c C-c C-y" . my/rust-test-current-file)
+              ("C-c C-c C-u" . my/rust-test-current-function)))
 
 (use-package swift-mode
   :ensure t
@@ -79,9 +109,7 @@
                         (setq-local eglot-ignored-server-capabilities '(:inlayHintProvider)))))
 
 (use-package dart-mode
-  :ensure t
-  :custom
-  (dart-format-on-save t))
+  :ensure t)
 
 (defvar flutter-tools-path
   (cond
@@ -116,8 +144,8 @@
 ;; Global rust-analyzer workspace config
 (setq-default eglot-workspace-configuration
               '((:rust-analyzer . (:check (:command "clippy" :extraArgs ["--no-deps"])
-                                   :procMacro (:enable t)
-                                   :cargo (:buildScripts (:enable t))))))
+                                          :procMacro (:enable t)
+                                          :cargo (:buildScripts (:enable t))))))
 
 (use-package eldoc
   :ensure nil

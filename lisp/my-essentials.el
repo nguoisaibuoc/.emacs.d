@@ -37,6 +37,9 @@
   (indicate-buffer-boundaries 'left)
   (mouse-wheel-tilt-scroll t)
   (mouse-wheel-flip-direction t)
+  (fast-but-imprecise-scrolling t)
+  (jit-lock-defer-time 0)
+  (redisplay-skip-fontification-on-input t)
 
   :hook
   ;; Auto-enable modes for specific situations
@@ -57,7 +60,6 @@
   (savehist-mode 1)
   (global-auto-revert-mode 1)
   (global-visual-line-mode 1)
-  (pixel-scroll-precision-mode 1)
   (xterm-mouse-mode 1)
   (cua-mode 1)
   (when (display-graphic-p)

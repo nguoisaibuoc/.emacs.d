@@ -47,12 +47,16 @@
   (display-time-mode 1))
 
 ;; Theme Configuration
+(use-package ef-themes
+  :ensure t)
+
 (use-package solarized-theme
   :ensure t
   :init
-  (setq solarized-use-less-bold t)
-  :config
-  (load-theme 'modus-vivendi t))
+  (setq solarized-use-less-bold t))
+
+(load-theme 'ef-autumn)
+
 (defun my-switch-theme (theme)
   "Disable all active themes and load THEME."
   (mapc #'disable-theme custom-enabled-themes)
