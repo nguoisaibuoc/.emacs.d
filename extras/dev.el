@@ -56,6 +56,32 @@
   :custom
   (rust-format-on-save nil)
   :config
+  (defun my/rust--package-name ()
+    "Extract the package name from the nearest Cargo.toml."
+    (when-let* ((file (buffer-file-name))
+                (dir (locate-dominating-file file "Cargo.toml"))
+                (manifest (expand-file-name "Cargo.toml" dir)))
+      (with-temp-buffer
+        (insert-file-contents manifest)
+        (goto-char (point-min))
+        (when (re-search-forward "^\\[package\\]" nil t)
+          (when (re-search-forward "^name\\s-*=\\s-*\"\\([^\"]+\\)\"" nil t)
+            (match-string 1))))))
+
+  (defun my/rust--target-flag ()
+    "Determine the cargo target flag (--lib, --bin, --test) based on file path."
+    (when-let* ((filename (buffer-file-name)))
+      (cond
+       ((string-match-p "/tests/" filename)
+        (format "--test %s" (file-name-base filename)))
+       ((string-match-p "/src/bin/" filename)
+        (format "--bin %s" (file-name-base filename)))
+       ((string-match-p "/src/main\\.rs$" filename)
+        "--bin")
+       ((string-match-p "/src/" filename)
+        "--lib")
+       (t ""))))
+
   (defun my/rust--current-function-name ()
     "Find the name of the function enclosing the point."
     (or
@@ -73,18 +99,29 @@
          (match-string-no-properties 1)))))
 
   (defun my/rust-test-current-function ()
-    "Run cargo test only for the test function under point."
+    "Run cargo test specifically for the test function under point with -q, -p, and target flag."
     (interactive)
     (if-let* ((fn-name (my/rust--current-function-name)))
-        (let ((cmd (format "cargo test %s -- --nocapture" fn-name)))
+        (let* ((pkg (my/rust--package-name))
+               (pkg-flag (if pkg (format "-p %s" pkg) ""))
+               (target-flag (my/rust--target-flag))
+               (raw-cmd (format "cargo test %s %s %s -- --nocapture"
+                                pkg-flag
+                                target-flag
+                                fn-name))
+               ;; Clean up extra spaces if flags are empty
+               (cmd (replace-regexp-in-string " +" " " (string-trim raw-cmd))))
           (compile cmd))
       (message "No Rust function found at cursor!")))
 
   (defun my/rust-test-current-file ()
-    "Run cargo test using the module name or current file name as a filter."
+    "Run cargo test using the module/file name as a filter with -q, -p, and target flag."
     (interactive)
     (if-let* ((filename (buffer-file-name)))
         (let* ((basename (file-name-base filename))
+               (pkg (my/rust--package-name))
+               (pkg-flag (if pkg (format "-p %s" pkg) ""))
+               (target-flag (my/rust--target-flag))
                (filter
                 (cond
                  ((member basename '("main" "lib")) "")
@@ -93,7 +130,11 @@
                                      (directory-file-name (file-name-directory filename)))))
                     (if (string= parent-dir "src") "" parent-dir)))
                  (t basename)))
-               (cmd (string-trim (format "cargo test -- --nocapture %s" filter))))
+               (raw-cmd (format "cargo test %s %s %s -- --nocapture"
+                                pkg-flag
+                                target-flag
+                                filter))
+               (cmd (replace-regexp-in-string " +" " " (string-trim raw-cmd))))
           (compile cmd))
       (message "Buffer is not visiting a file!")))
 
@@ -172,9 +213,13 @@
   (compilation-scroll-output t) 
   (compilation-always-kill t)
   (compilation-skip-threshold 2)
+  (compilation-environment '("CARGO_TERM_COLOR=always" "CLICOLOR_FORCE=1"))
   :config
   (require 'ansi-color)
-  (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter))
+  (require 'ansi-osc nil t)
+  (add-hook 'compilation-filter-hook #'ansi-color-compilation-filter)
+  (when (fboundp 'ansi-osc-compilation-filter)
+    (add-hook 'compilation-filter-hook #'ansi-osc-compilation-filter)))
 
 ;; Force dev-related buffers to open in a side window on the right
 (add-to-list 'display-buffer-alist
