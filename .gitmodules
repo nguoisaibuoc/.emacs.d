@@ -1,0 +1,3 @@
+[submodule "extras/lang/flutter-tools"]
+	path = extras/lang/flutter-tools
+	url = https://github.com/palkiaex/flutter-tools.git
