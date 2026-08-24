@@ -18,7 +18,6 @@
   (setq evil-want-keybinding nil)
   (setq evil-esc-delay 0)
 
-
   :config
   (evil-mode)
 
@@ -31,6 +30,8 @@
   (evil-set-initial-state 'shell-mode 'emacs)
   (evil-set-initial-state 'eshell-mode 'emacs)
   (evil-set-initial-state 'comint-mode 'emacs))
+
+(global-set-key (kbd "C-c u") #'universal-argument)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                  Visual

@@ -150,7 +150,7 @@
 
 ;; Force dev-related buffers to open in a side window on the right
 (add-to-list 'display-buffer-alist
-             '("^\\*\\(compilation\\|cargo.*\\|rust.*\\|eldoc.*\\)\\*$"
+             '("^\\*\\(compilation\\|cargo.*\\|rust.*\\|eldoc.*\\|flutter.*\\)\\*$"
                (display-buffer-reuse-window display-buffer-in-side-window)
                (side . right)
                (window-width . 0.4)))
