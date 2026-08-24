@@ -44,6 +44,31 @@
      (when (re-search-backward "\\bfn\\s-+\\([a-zA-Z0-9_]+\\)" nil t)
        (match-string-no-properties 1)))))
 
+;;; --- Cargo / Workspace Sync ---
+
+(defun my/rust-analyzer-reload-workspace ()
+  "Tell rust-analyzer to reload Cargo.toml and workspace metadata."
+  (interactive)
+  (let ((reloaded nil))
+    (dolist (server (if (boundp 'eglot--servers-by-project)
+                        (apply #'append (hash-table-values eglot--servers-by-project))
+                      (list (eglot-current-server))))
+      (when (and server (jsonrpc-running-p server))
+        (jsonrpc-async-request server :rust-analyzer/reloadWorkspace nil)
+        (setq reloaded t)))
+    (if reloaded
+        (message "rust-analyzer: workspace reload requested.")
+      (message "No active rust-analyzer server found."))))
+
+(defun my/rust-cargo-toml-after-save ()
+  "Trigger rust-analyzer reload when saving Cargo.toml or Cargo.lock."
+  (when (and (buffer-file-name)
+             (member (file-name-nondirectory (buffer-file-name))
+                     '("Cargo.toml" "Cargo.lock")))
+    (my/rust-analyzer-reload-workspace)))
+
+(add-hook 'after-save-hook #'my/rust-cargo-toml-after-save)
+
 ;;; --- Interactive Commands ---
 
 (defun my/rust-test-current-function ()
@@ -96,7 +121,8 @@
   (rust-format-on-save nil)
   :bind (:map rust-mode-map
               ("C-c C-c C-y" . my/rust-test-current-file)
-              ("C-c C-c C-u" . my/rust-test-current-function)))
+              ("C-c C-c C-u" . my/rust-test-current-function)
+              ("C-c C-c C-s" . my/rust-analyzer-reload-workspace)))
 
 (setq-default eglot-workspace-configuration
               '((:rust-analyzer . (:check (:command "clippy" :extraArgs ["--no-deps"])
