@@ -73,10 +73,11 @@
   (eglot-managed-mode . (lambda ()
                           (add-hook 'before-save-hook #'eglot-format-buffer nil t)))
   :custom
-  (eglot-ignored-server-capabilities '(:inlayHintProvider :semanticTokensProvider))
-  (eglot-send-changes-idle-time 0.5)
+  (eglot-sync-connect 0)
   (eglot-extend-to-xref t)
+  (eglot-send-changes-idle-time 0.5)
   (eglot-events-buffer-config '(:size 0))
+  (eglot-ignored-server-capabilities '(:inlayHintProvider :semanticTokensProvider))
   :config
   (add-to-list 'eglot-server-programs
                `(swift-mode . ,(if (eq system-type 'darwin)
@@ -97,6 +98,13 @@
 	         nil)))
       (apply orig-fn args)))
   (advice-add 'eldoc-display-in-echo-area :around #'my-eldoc-dynamic-multiline))
+
+(use-package flymake
+  :ensure nil
+  :custom
+  (setq flymake-show-diagnostics-at-end-of-line t)
+  :bind (("C-c d" . flymake-show-buffer-diagnostics)
+         ("C-c D" . flymake-show-project-diagnostics)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; COMPILATION & WINDOW MANAGEMENT

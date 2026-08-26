@@ -69,4 +69,9 @@
   (windmove-default-keybindings 'control)
   (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete))
 
+;; Don't mess with my font size
+(global-set-key (kbd "<pinch>") 'ignore)
+(global-set-key (kbd "<C-wheel-up>") 'ignore)
+(global-set-key (kbd "<C-wheel-down>") 'ignore)
+
 (provide 'my-essentials)

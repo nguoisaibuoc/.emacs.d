@@ -62,8 +62,4 @@
     (kbd "g c n") #'eglot-rename
     (kbd "g c a") #'eglot-code-actions))
 
-(use-package flymake
-  :bind (("C-c d" . flymake-show-buffer-diagnostics)
-	 ("C-c D" . flymake-show-project-diagnostics)))
-
 (provide 'vim-like)
