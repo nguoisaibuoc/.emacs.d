@@ -16,18 +16,6 @@
   (create-lockfiles nil)
   (switch-to-buffer-obey-display-actions t)
 
-  ;; Minibuffer & Completion
-  (enable-recursive-minibuffers t)
-  (completion-cycle-threshold 1)
-  (completions-detailed t)
-  (tab-always-indent 'complete)
-  (completion-styles '(basic initials substring))
-  (completion-auto-help 'always)
-  (completions-max-height 20)
-  (completions-format 'one-column)
-  (completions-group t)
-  (completion-auto-select 'second-tab)
-
   ;; Visual Layout & Scrolling
   (line-number-mode t)
   (column-number-mode t)
@@ -73,5 +61,28 @@
 (global-set-key (kbd "<pinch>") 'ignore)
 (global-set-key (kbd "<C-wheel-up>") 'ignore)
 (global-set-key (kbd "<C-wheel-down>") 'ignore)
+
+(use-package minibuffer
+  :ensure nil
+  :demand t
+  :bind
+  ( :map completion-in-region-mode-map
+    ("M-i" . minibuffer-choose-completion)
+    ("M-n" . minibuffer-next-completion)
+    ("M-p" . minibuffer-previous-completion))
+  :custom
+  (enable-recursive-minibuffers t)
+  (minibuffer-visible-completions t)
+  (completion-auto-help 'always)
+  (completion-auto-select nil)
+  (completion-cycle-threshold 1)
+  (completion-eager-update t)
+  (completions-detailed t)
+  (completions-format 'one-column)
+  (completions-group t)
+  (completions-max-height 12)
+  (completion-styles '(basic initials substring))
+  :config
+  (setq tab-always-indent 'complete))
 
 (provide 'my-essentials)

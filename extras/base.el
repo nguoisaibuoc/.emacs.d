@@ -60,7 +60,7 @@
   :custom
   (tab-always-indent 'complete)
   (text-mode-ispell-word-completion nil)
-  (read-extended-command-predicate #'command-completion-default-include-p))
+ (read-extended-command-predicate #'command-completion-default-include-p))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; POWER-UPS: SEARCH & ACTIONS (Consult, Embark, Wgrep)
