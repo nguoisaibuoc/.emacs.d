@@ -66,12 +66,15 @@
 ;;; LSP & FORMATTING
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(use-package apheleia
+  :ensure t
+  :config
+  (apheleia-global-mode +1))
+
 (use-package eglot
   :ensure nil
   :hook
   ((rust-mode rust-ts-mode python-ts-mode lua-ts-mode dart-mode swift-mode) . eglot-ensure)
-  (eglot-managed-mode . (lambda ()
-                          (add-hook 'before-save-hook #'eglot-format-buffer nil t)))
   :custom
   (eglot-sync-connect 0)
   (eglot-extend-to-xref t)
