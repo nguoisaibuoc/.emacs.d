@@ -76,6 +76,7 @@
   :hook
   ((rust-mode rust-ts-mode python-ts-mode lua-ts-mode dart-mode swift-mode) . eglot-ensure)
   :custom
+  (fset #'jsonrpc--log-event #'ignore)
   (eglot-sync-connect 0)
   (eglot-extend-to-xref t)
   (eglot-send-changes-idle-time 0.5)
