@@ -90,8 +90,6 @@
 
 (use-package eldoc
   :ensure nil
-  :custom
-  (eldoc-idle-delay 1)
   :config
   (defun my-eldoc-dynamic-multiline (orig-fn &rest args)
     "Expand Eldoc to multiple lines only if there is a Flymake diagnostic at point."
