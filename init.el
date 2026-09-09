@@ -21,12 +21,12 @@
   :demand t
   :config
   (setq auto-save-file-name-transforms
-	`((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+	    `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
   (setq backup-directory-alist
-	`((".*" . ,(no-littering-expand-var-file-name "backup/")))))
+	    `((".*" . ,(no-littering-expand-var-file-name "backup/")))))
 
 ;; Increase read size for rust-analyzer's massive JSON responses
-(setq read-process-output-max (* 3 1024 1024))
+(setq read-process-output-max (* 5 1024 1024))
 
 ;; Smart Garbage Collection (speeds up Emacs significantly)
 (use-package gcmh
