@@ -57,11 +57,6 @@
   (windmove-default-keybindings 'control)
   (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete))
 
-;; Don't mess with my font size
-(global-set-key (kbd "<pinch>") 'ignore)
-(global-set-key (kbd "<C-wheel-up>") 'ignore)
-(global-set-key (kbd "<C-wheel-down>") 'ignore)
-
 (use-package minibuffer
   :ensure nil
   :demand t
@@ -84,5 +79,14 @@
   (completion-styles '(basic initials substring))
   :config
   (setq tab-always-indent 'complete))
+
+;; Don't mess with my font size
+(global-set-key (kbd "<pinch>") 'ignore)
+(global-set-key (kbd "<C-wheel-up>") 'ignore)
+(global-set-key (kbd "<C-wheel-down>") 'ignore)
+
+;; Disable horizontal scrolling
+(global-set-key (kbd "<wheel-left>") 'ignore)
+(global-set-key (kbd "<wheel-right>") 'ignore)
 
 (provide 'my-essentials)
