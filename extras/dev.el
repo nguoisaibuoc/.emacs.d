@@ -76,12 +76,13 @@
   :hook
   ((rust-mode rust-ts-mode python-ts-mode lua-ts-mode dart-mode swift-mode) . eglot-ensure)
   :custom
-  (fset #'jsonrpc--log-event #'ignore)
-  (eglot-sync-connect 0)
+  (eglot-sync-connect nil)
   (eglot-extend-to-xref t)
   (eglot-send-changes-idle-time 0.5)
-  (eglot-events-buffer-config '(:size 0))
-  (eglot-ignored-server-capabilities '(:inlayHintProvider :semanticTokensProvider))
+  (eglot-report-progress nil)
+  (eglot-code-action-indications nil)
+  (eglot-events-buffer-config '(:size 0 :format short))
+  (eglot-ignored-server-capabilities '(:inlayHintProvider :semanticTokensProvider :documentOnTypeFormattingProvider))
   :config
   (add-to-list 'eglot-server-programs
                `(swift-mode . ,(if (eq system-type 'darwin)
@@ -126,11 +127,16 @@
   (when (fboundp 'ansi-osc-compilation-filter)
     (add-hook 'compilation-filter-hook #'ansi-osc-compilation-filter)))
 
-;; Force dev-related buffers to open in a side window on the right
 (add-to-list 'display-buffer-alist
-             '("^\\*\\(compilation\\|cargo.*\\|rust.*\\|eldoc.*\\|flutter.*\\)\\*$"
+             '("^\\*\\(eldoc.*\\)\\*$"
                (display-buffer-reuse-window display-buffer-in-side-window)
                (side . right)
                (window-width . 0.4)))
+
+(add-to-list 'display-buffer-alist
+             '("^\\*\\(compilation\\|cargo.*\\|rust.*\\|flutter.*\\)\\*$"
+               (display-buffer-reuse-window display-buffer-in-side-window)
+               (side . bottom)
+               (window-height . 0.25)))
 
 (provide 'dev)
