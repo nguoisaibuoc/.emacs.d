@@ -125,18 +125,26 @@
   (require 'ansi-osc nil t)
   (add-hook 'compilation-filter-hook #'ansi-color-compilation-filter)
   (when (fboundp 'ansi-osc-compilation-filter)
-    (add-hook 'compilation-filter-hook #'ansi-osc-compilation-filter)))
+    (add-hook 'compilation-filter-hook #'ansi-osc-compilation-filter))
+  (defun my-compilation-reuse-window (orig-fn &rest args)
+    "Force compilation errors to use existing windows instead of splitting."
+    (let ((display-buffer-overriding-action
+           '((display-buffer-reuse-window
+              display-buffer-in-previous-window
+              display-buffer-use-some-window))))
+      (apply orig-fn args)))
+  (advice-add 'compilation-goto-locus :around #'my-compilation-reuse-window))
 
 (add-to-list 'display-buffer-alist
              '("^\\*\\(eldoc.*\\)\\*$"
                (display-buffer-reuse-window display-buffer-in-side-window)
                (side . right)
-               (window-width . 0.4)))
+               (window-width . 0.35)))
 
 (add-to-list 'display-buffer-alist
              '("^\\*\\(compilation\\|cargo.*\\|rust.*\\|flutter.*\\)\\*$"
                (display-buffer-reuse-window display-buffer-in-side-window)
-               (side . bottom)
-               (window-height . 0.25)))
+               (side . right)
+               (window-width . 0.35)))
 
 (provide 'dev)
