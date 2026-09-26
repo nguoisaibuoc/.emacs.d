@@ -75,7 +75,7 @@
 (use-package eglot
   :ensure nil
   :hook
-  ((rust-mode rust-ts-mode python-ts-mode lua-ts-mode dart-mode swift-mode) . eglot-ensure)
+  ((rust-ts-mode python-ts-mode lua-ts-mode dart-mode swift-mode) . eglot-ensure)
   :custom
   (eglot-sync-connect nil)
   (eglot-extend-to-xref t)

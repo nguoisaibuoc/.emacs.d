@@ -2,6 +2,17 @@
 
 ;;; --- Helper Functions ---
 
+(defun my/rust--workspace-root ()
+  "Find the root of the current project/workspace."
+  (or (and (fboundp 'project-current)
+           (when-let* ((pr (project-current)))
+             (if (fboundp 'project-root)
+                 (project-root pr)
+               (cdr pr))))
+      (when (fboundp 'vc-root-dir) (vc-root-dir))
+      (locate-dominating-file default-directory ".git")
+      default-directory))
+
 (defun my/rust--package-name ()
   "Extract the package name from the nearest Cargo.toml."
   (when-let* ((file (buffer-file-name))
@@ -71,6 +82,30 @@
 
 ;;; --- Interactive Commands ---
 
+(defun my/rust-run-app ()
+  "Run the current Rust application using cargo run.
+If in a binary file, runs that specific binary.
+If in a library, falls back to running the default workspace binary."
+  (interactive)
+  (let* ((pkg (my/rust--package-name))
+         (target-flag (my/rust--target-flag))
+         (is-bin (and target-flag (string-prefix-p "--bin" target-flag))))
+    (if is-bin
+        ;; Run specific binary if cursor is inside a binary file
+        (let* ((pkg-flag (if pkg (format "-p %s" pkg) ""))
+               (raw-cmd (format "cargo run %s %s" pkg-flag target-flag))
+               (cmd (replace-regexp-in-string " +" " " (string-trim raw-cmd))))
+          (compile cmd))
+      ;; Run the workspace's default app if we are inside a library crate
+      (let ((default-directory (my/rust--workspace-root)))
+        (compile "cargo run")))))
+
+(defun my/rust-test-project ()
+  "Run cargo test for the entire project/workspace."
+  (interactive)
+  (let ((default-directory (my/rust--workspace-root)))
+    (compile "cargo test")))
+
 (defun my/rust-test-current-function ()
   "Run cargo test specifically for the test function under point with -q, -p, and target flag."
   (interactive)
@@ -113,11 +148,11 @@
 
 ;;; --- Package Configuration ---
 
-(use-package rust-mode
-  :ensure t
-  :custom
-  (rust-format-on-save nil)
+(use-package rust-ts-mode
+  :ensure nil
   :bind (:map rust-ts-mode-map
+              ("C-c C-c C-r" . my/rust-run-app)
+              ("C-c C-c C-t" . my/rust-test-project)
               ("C-c C-c C-y" . my/rust-test-current-file)
               ("C-c C-c C-u" . my/rust-test-current-function)
               ("C-c C-c C-s" . my/rust-analyzer-reload-workspace)))

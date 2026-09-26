@@ -18,6 +18,7 @@
 ;; Default frame configuration: full screen, good-looking title bar on macOS,
 ;; and PREVENT drawing toolbars/scrollbars to save startup time.
 (setq default-frame-alist '((fullscreen . maximized)
+                            (undecorated . t)
                             ;; Disable UI elements natively to prevent flashing
                             (tool-bar-lines . 0)
                             (menu-bar-lines . 0)
