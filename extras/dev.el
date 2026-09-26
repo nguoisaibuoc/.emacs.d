@@ -105,8 +105,6 @@
 
 (use-package flymake
   :ensure nil
-  :custom
-  (flymake-show-diagnostics-at-end-of-line t)
   :bind (("C-c d" . flymake-show-buffer-diagnostics)
          ("C-c D" . flymake-show-project-diagnostics)))
 
