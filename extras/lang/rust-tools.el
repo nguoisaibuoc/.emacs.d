@@ -115,11 +115,9 @@
 
 (use-package rust-mode
   :ensure t
-  :init
-  (setq rust-mode-treesitter-derive t)
   :custom
   (rust-format-on-save nil)
-  :bind (:map rust-mode-map
+  :bind (:map rust-ts-mode-map
               ("C-c C-c C-y" . my/rust-test-current-file)
               ("C-c C-c C-u" . my/rust-test-current-function)
               ("C-c C-c C-s" . my/rust-analyzer-reload-workspace)))

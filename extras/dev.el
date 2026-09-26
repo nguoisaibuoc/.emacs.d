@@ -18,7 +18,8 @@
      (json-mode       . json-ts-mode)
      (css-mode        . css-ts-mode)
      (python-mode     . python-ts-mode)
-     (lua-mode        . lua-ts-mode)))
+     (lua-mode        . lua-ts-mode)
+     (rust-mode       . rust-ts-mode)))
   :hook
   (prog-mode . electric-pair-mode))
 
@@ -105,7 +106,7 @@
 (use-package flymake
   :ensure nil
   :custom
-  (setq flymake-show-diagnostics-at-end-of-line t)
+  (flymake-show-diagnostics-at-end-of-line t)
   :bind (("C-c d" . flymake-show-buffer-diagnostics)
          ("C-c D" . flymake-show-project-diagnostics)))
 
