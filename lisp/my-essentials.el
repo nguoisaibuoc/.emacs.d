@@ -1,4 +1,8 @@
-;;; my-essentials.el -*- lexical-binding: t; -*-
+;;; my-essentials.el --- Essentials configuration -*- lexical-binding: t; -*-
+
+;;; Commentary:
+
+;;; Code:
 
 (use-package emacs
   :ensure nil
@@ -90,3 +94,4 @@
 (global-set-key (kbd "<wheel-right>") 'ignore)
 
 (provide 'my-essentials)
+;;; my-essentials.el ends here

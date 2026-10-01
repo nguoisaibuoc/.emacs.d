@@ -35,7 +35,7 @@
 
 (use-package magit
   :ensure t
-  :bind 
+  :bind
   (("C-x g" . magit-status)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -103,10 +103,14 @@
       (apply orig-fn args)))
   (advice-add 'eldoc-display-in-echo-area :around #'my-eldoc-dynamic-multiline))
 
-(use-package flymake
-  :ensure nil
-  :bind (("C-c d" . flymake-show-buffer-diagnostics)
-         ("C-c D" . flymake-show-project-diagnostics)))
+(use-package flycheck
+  :ensure t
+  :hook ((after-init . global-flycheck-mode))
+  :bind (("C-c d" . flycheck-list-errors))
+  :config
+  (global-flycheck-eglot-mode 1)
+  (evil-define-key '(normal motion) flycheck-error-list-mode-map
+    (kbd "g p") (lookup-key flycheck-error-list-mode-map (kbd "P"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; COMPILATION & WINDOW MANAGEMENT
@@ -115,7 +119,7 @@
 (use-package compile
   :ensure nil
   :custom
-  (compilation-scroll-output t) 
+  (compilation-scroll-output t)
   (compilation-always-kill t)
   (compilation-skip-threshold 2)
   (compilation-environment '("CARGO_TERM_COLOR=always" "CLICOLOR_FORCE=1"))

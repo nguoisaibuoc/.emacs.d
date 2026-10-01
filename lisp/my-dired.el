@@ -4,7 +4,8 @@
   :ensure nil
   :custom
   (auto-revert-avoid-polling t)
-  (auto-revert-interval 5)
+  (auto-revert-interval 1)
+  (auto-revert-use-notify t)
   (auto-revert-check-vc-info t)
   (auto-revert-verbose nil)
   (global-auto-revert-non-file-buffers t)

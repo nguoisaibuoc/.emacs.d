@@ -3,6 +3,10 @@
 /elpa/
 /eln-cache/
 /tree-sitter/
+/auto-save-list/
+history
+projects.eld
+custom.el~
 custom.el
 *.elc
 

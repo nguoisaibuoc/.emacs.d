@@ -1,4 +1,10 @@
-;;; -*- lexical-binding: t; -*-
+;;; init.el --- init.el -*- lexical-binding: t; -*-
+
+;;; Commentary:
+
+;; Entry point for Emacs initialization
+
+;;; Code:
 
 (when (< emacs-major-version 29)
   (error "Emacs Bedrock only works with Emacs 29 and newer; you have version %s" emacs-major-version))
@@ -14,16 +20,6 @@
   (package-native-compile t)
   :config
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
-
-;; Keep `.emacs.d` clean from auto-generated files
-(use-package no-littering
-  :ensure t
-  :demand t
-  :config
-  (setq auto-save-file-name-transforms
-	    `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
-  (setq backup-directory-alist
-	    `((".*" . ,(no-littering-expand-var-file-name "backup/")))))
 
 ;; Increase read size for rust-analyzer's massive JSON responses
 (setq read-process-output-max (* 5 1024 1024))
@@ -64,3 +60,4 @@
 (require 'base)
 (require 'dev)
 (require 'organizer)
+;;; init.el ends here
