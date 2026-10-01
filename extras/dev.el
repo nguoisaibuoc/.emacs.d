@@ -1,23 +1,6 @@
 ;;; dev.el --- development utilities -*- lexical-binding: t; -*-
 
 ;;; Commentary:
-;;
-;; A curated, modern development environment for Emacs.
-;;
-;; This configuration focuses on a clean workspace and leverages modern Emacs
-;; built-ins where possible, alongside industry-standard third-party tools.
-;; 
-;; Key features include:
-;; - Modern Core: Tree-sitter integrations for major languages and `project.el`.
-;; - Git Integration: Standard `magit` configuration.
-;; - LSP & Linting: Fast, lightweight `eglot` setup paired with `flycheck`
-;;   and automated buffer formatting via `apheleia`.
-;; - Language Support: Configurations for Rust, Swift, Dart/Flutter, Python,
-;;   Lua, and web formats.
-;; - Window Management: Opinionated `display-buffer-alist` rules that push
-;;   compilation, documentation, and tooling buffers to a clean right-side panel,
-;;   preventing messy window splits.
-;;
 
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
