@@ -1,8 +1,5 @@
-;;; dev.el --- development utilities -*- lexical-binding: t; -*-
+;;; dev.el -*- lexical-binding: t -*-
 
-;;; Commentary:
-
-;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; CORE DEV SETTINGS & TREE-SITTER
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -38,14 +35,8 @@
 
 (use-package magit
   :ensure t
-  :bind
-  (("C-x g" . magit-status)
-   :map magit-mode-map
-   ("x" . magit-discard))
-  :hook
-  (after-save . magit-after-save-refresh-status)
-  :custom
-  (magit-refresh-status-buffer t))
+  :bind 
+  (("C-x g" . magit-status)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; PROGRAMMING LANGUAGES
@@ -112,12 +103,10 @@
       (apply orig-fn args)))
   (advice-add 'eldoc-display-in-echo-area :around #'my-eldoc-dynamic-multiline))
 
-(use-package flycheck
-  :ensure t
-  :hook ((after-init . global-flycheck-mode))
-  :bind (("C-c d" . flycheck-list-errors))
-  :config
-  (global-flycheck-eglot-mode 1))
+(use-package flymake
+  :ensure nil
+  :bind (("C-c d" . flymake-show-buffer-diagnostics)
+         ("C-c D" . flymake-show-project-diagnostics)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; COMPILATION & WINDOW MANAGEMENT
@@ -126,7 +115,7 @@
 (use-package compile
   :ensure nil
   :custom
-  (compilation-scroll-output t)
+  (compilation-scroll-output t) 
   (compilation-always-kill t)
   (compilation-skip-threshold 2)
   (compilation-environment '("CARGO_TERM_COLOR=always" "CLICOLOR_FORCE=1"))
@@ -156,7 +145,5 @@
                (display-buffer-reuse-window display-buffer-in-side-window)
                (side . right)
                (window-width . 0.35)))
-(put 'eglot-flymake-backend 'flymake-always-safe t)
 
 (provide 'dev)
-;;; dev.el ends here
