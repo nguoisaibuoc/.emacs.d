@@ -92,16 +92,8 @@
 
 (use-package eldoc
   :ensure nil
-  :config
-  (defun my-eldoc-dynamic-multiline (orig-fn &rest args)
-    "Expand Eldoc to multiple lines only if there is a Flymake diagnostic at point."
-    (let ((eldoc-echo-area-use-multiline-p
-	       (if (and (bound-and-true-p flymake-mode)
-		            (flymake-diagnostics (point)))
-	           t
-	         nil)))
-      (apply orig-fn args)))
-  (advice-add 'eldoc-display-in-echo-area :around #'my-eldoc-dynamic-multiline))
+  :custom
+  (eldoc-echo-area-use-multiline-p t))
 
 (use-package flycheck
   :ensure t
@@ -109,6 +101,8 @@
   :bind (("C-c d" . flycheck-list-errors))
   :config
   (global-flycheck-eglot-mode 1)
+  (setq flycheck-display-errors-function
+        #'flycheck-display-error-messages-unless-error-list)
   (evil-define-key '(normal motion) flycheck-error-list-mode-map
     (kbd "g p") (lookup-key flycheck-error-list-mode-map (kbd "P"))))
 

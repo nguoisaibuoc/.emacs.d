@@ -21,6 +21,16 @@
   :config
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 
+;; Keep `.emacs.d` clean from auto-generated files
+(use-package no-littering
+  :ensure t
+  :demand t
+  :config
+  (setq auto-save-file-name-transforms
+	    `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+  (setq backup-directory-alist
+	    `((".*" . ,(no-littering-expand-var-file-name "backup/")))))
+
 ;; Increase read size for rust-analyzer's massive JSON responses
 (setq read-process-output-max (* 5 1024 1024))
 
